@@ -16,6 +16,16 @@
             width: 100vw;
 
         }
+        
+        /* Target iframe content - this may not work due to cross-origin restrictions */
+        iframe {
+            border-radius: 0 !important;
+        }
+        
+        /* Alternative approach - inject styles into iframe if possible */
+        #heygen-streaming-container iframe {
+            border-radius: 0 !important;
+        }
     </style>
 </head>
 
@@ -35,12 +45,36 @@
             container.id = "heygen-streaming-container";
             const stylesheet = document.createElement("style");
             stylesheet.innerHTML =
-                `\n  #heygen-streaming-embed {\n    z-index: 9999;\n    position: fixed;\n    top: 0;\n    left: 0;\n    width: 100vw;\n    height: 100vh;\n    border: 0;\n    box-shadow: none;\n    transition: all linear 0.1s;\n    overflow: hidden;\n    opacity: 1;\n    visibility: visible;\n  }\n  #heygen-streaming-embed.show {\n    opacity: 1;\n    visibility: visible;\n  }\n  #heygen-streaming-embed.expand {\n    top: 0;\n    left: 8vw;\n    width: 85vw;\n    height: 100vh;\n    border: 0;\n    border-radius: 0;\n    box-shadow: none;\n  }\n  #heygen-streaming-container {\n    width: 100%;\n    height: 100%;\n  }\n  #heygen-streaming-container iframe {\n    width: 100%;\n    height: 100%;\n    border: 0;\n  }\n  `;
+                `\n  #heygen-streaming-embed {\n    z-index: 9999;\n    position: fixed;\n    top: 0;\n    left: 0;\n    width: 100vw;\n    height: 100vh;\n    border: 0;\n    box-shadow: none;\n    transition: all linear 0.1s;\n    overflow: hidden;\n    opacity: 1;\n    visibility: visible;\n  }\n  #heygen-streaming-embed.show {\n    opacity: 1;\n    visibility: visible;\n  }\n  #heygen-streaming-embed.expand {\n    top: 0;\n    left: 8vw;\n    width: 86vw;\n    height: 100vh;\n    border: 0;\n    border-radius: 0;\n    box-shadow: none;\n  }\n  #heygen-streaming-container {\n    width: 100%;\n    height: 100%;\n  }\n  #heygen-streaming-container iframe {\n    width: 100%;\n    height: 100%;\n    border: 0;\n  }\n  `;
             const iframe = document.createElement("iframe");
             iframe.allowFullscreen = !1, iframe.title = "Streaming Embed", iframe.role = "dialog", iframe.allow =
                 "microphone", iframe.src = url;
             iframe.style.overflow = "hidden";
             iframe.setAttribute("scrolling", "no");
+            
+            // Try to inject CSS into iframe content
+            iframe.onload = function() {
+                try {
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    if (iframeDoc) {
+                        const style = iframeDoc.createElement('style');
+                        style.textContent = `
+                            .css-iogrug div {
+                                border-radius: 0 !important;
+                            }
+                        `;
+                        iframeDoc.head.appendChild(style);
+                        
+                        // Also try to apply styles directly to existing elements
+                        const elements = iframeDoc.querySelectorAll('.css-iogrug div');
+                        elements.forEach(el => {
+                            el.style.borderRadius = '0px';
+                        });
+                    }
+                } catch (e) {
+                    console.log('Cannot access iframe content due to cross-origin restrictions');
+                }
+            };
             let visible = !1,
                 initial = !1;
             window.addEventListener("message", (e => {
