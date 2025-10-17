@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Peninsula-ai/</title>
     <style>
-        body {
+        html, body {
             overflow: hidden;
         }
         img{
@@ -35,6 +35,8 @@
             const iframe = document.createElement("iframe");
             iframe.allowFullscreen = !1, iframe.title = "Streaming Embed", iframe.role = "dialog", iframe.allow =
                 "microphone", iframe.src = url;
+            iframe.style.overflow = "hidden";
+            iframe.setAttribute("scrolling", "no");
             let visible = !1,
                 initial = !1;
             window.addEventListener("message", (e => {
